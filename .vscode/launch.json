@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - MemoryFS",
+            "request": "launch",
+            "mainClass": "MemoryFS",
+            "projectName": "MemoryFS",
+            "args": "-d -f /home/willy/memMount"
+        }
+    ]
+}

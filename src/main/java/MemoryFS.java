@@ -18,7 +18,7 @@ import java.util.Objects;
 import com.sun.security.auth.module.UnixSystem;
 
 /**
- * @author Luke Thompson and (add your name here)
+ * @author Luke Thompson and William Shin
  * @since 04.09.19
  */
 public class MemoryFS extends FileSystemStub {
@@ -77,8 +77,30 @@ public class MemoryFS extends FileSystemStub {
         //      name - the file name (with no "/" at the beginning)
         //      stbuf - the FileStat information for the file
         //      off - just use 0
+
+        System.out.println(path);
         filler.apply(buf, ".", null, 0);
         filler.apply(buf, "..", null, 0);
+        filler.apply(buf, path, null, 0);
+        filler.apply(buf, HELLO_PATH, null, 0);
+        File dir = new File(path);
+
+        // if (this.iNodeTable.containsINode(path)) {
+        //     filler.apply(buf, path, null, 0);
+        // }
+
+        if (dir.isDirectory) {
+            for (File f: dir.listFiles()) {
+                filler.apply(buf, f.getName(), null, 0);
+            }
+        } else {
+            filler.apply(buf, dir.getName(), null, 0);
+        }
+        
+
+        // for (String fileName: this.iNodeTable.entries()) {
+        //     filler.apply(buf, fileName, null, 0);
+        // }
 
         return 0;
     }
