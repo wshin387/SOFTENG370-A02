@@ -78,29 +78,10 @@ public class MemoryFS extends FileSystemStub {
         //      stbuf - the FileStat information for the file
         //      off - just use 0
 
-        System.out.println(path);
-        filler.apply(buf, ".", null, 0);
-        filler.apply(buf, "..", null, 0);
-        filler.apply(buf, path, null, 0);
-        filler.apply(buf, HELLO_PATH, null, 0);
-        File dir = new File(path);
-
-        // if (this.iNodeTable.containsINode(path)) {
-        //     filler.apply(buf, path, null, 0);
-        // }
-
-        if (dir.isDirectory) {
-            for (File f: dir.listFiles()) {
-                filler.apply(buf, f.getName(), null, 0);
-            }
-        } else {
-            filler.apply(buf, dir.getName(), null, 0);
+        for (String fileName: this.iNodeTable.entries()) {
+            System.out.println(fileName);
+            filler.apply(buf, fileName.substring(1), this.iNodeTable.getINode(fileName).getStat(), 0);
         }
-        
-
-        // for (String fileName: this.iNodeTable.entries()) {
-        //     filler.apply(buf, fileName, null, 0);
-        // }
 
         return 0;
     }
