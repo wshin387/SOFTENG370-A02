@@ -6,7 +6,7 @@
             "request": "launch",
             "mainClass": "MemoryFS",
             "projectName": "MemoryFS",
-            "args": "-d -f /home/willy/memMount"
+            "args": "-d -f /home/william/memMount"
         }
     ]
 }
