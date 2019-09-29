@@ -38,6 +38,16 @@ public class MemoryFS extends FileSystemStub {
         // you will have to add more stat information here eventually
         stat.st_mode.set(FileStat.S_IFREG | 0444 | 0200);
         stat.st_size.set(HELLO_STR.getBytes().length);
+        stat.st_nlink.set(1);
+        stat.st_uid.set(unix.getUid());
+        stat.st_gid.set(unix.getGid());
+        
+        //stat.st_ctim.set(FileStat.of(conn).st_ctim);
+        //stat.st_ctim.set(new Timespec(stat.getRuntime()));
+        //stat.st_ctim.tv_sec = Runtime.getSystemRuntime();
+
+
+
         iNode.setStat(stat);
         iNode.setContent(HELLO_STR.getBytes());
         iNodeTable.updateINode(HELLO_PATH, iNode);
@@ -61,6 +71,21 @@ public class MemoryFS extends FileSystemStub {
             // fill in the stat object with values from the savedStat object of your inode
             stat.st_mode.set(savedStat.st_mode.intValue());
             stat.st_size.set(savedStat.st_size.intValue());
+            stat.st_dev.set(savedStat.st_dev.intValue());
+            stat.st_ino.set(savedStat.st_ino.intValue());
+            stat.st_nlink.set(savedStat.st_nlink.intValue());
+            stat.st_uid.set(savedStat.st_uid.intValue());
+            stat.st_gid.set(savedStat.st_gid.intValue());
+            stat.st_rdev.set(savedStat.st_rdev.intValue());
+            stat.st_blksize.set(savedStat.st_blksize.intValue());
+            stat.st_blocks.set(savedStat.st_blocks.intValue());
+            stat.st_atim.tv_sec.set(savedStat.st_atim.tv_sec.intValue());
+            stat.st_atim.tv_nsec.set(savedStat.st_atim.tv_nsec.intValue());
+            stat.st_mtim.tv_sec.set(savedStat.st_mtim.tv_sec.intValue());
+            stat.st_mtim.tv_nsec.set(savedStat.st_mtim.tv_nsec.intValue());
+            stat.st_ctim.tv_sec.set(savedStat.st_ctim.tv_sec.intValue());
+            stat.st_ctim.tv_nsec.set(savedStat.st_ctim.tv_nsec.intValue());
+
 
         } else {
             res = -ErrorCodes.ENOENT();
