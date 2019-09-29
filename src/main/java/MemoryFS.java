@@ -4,6 +4,7 @@ import com.github.lukethompsxn.edufuse.util.ErrorCodes;
 import com.github.lukethompsxn.edufuse.util.FuseFillDir;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
+import jnr.ffi.Struct;
 import jnr.ffi.types.dev_t;
 import jnr.ffi.types.mode_t;
 import jnr.ffi.types.off_t;
@@ -35,13 +36,38 @@ public class MemoryFS extends FileSystemStub {
         // setup an example file for testing purposes
         MemoryINode iNode = new MemoryINode();
         FileStat stat = new FileStat(Runtime.getSystemRuntime());
+
+        System.out.println("init getSystemRuntime: " + Runtime.getSystemRuntime());
+        System.out.println("init ctim.tv_sec: " + stat.st_ctim.tv_sec.get());
+
         // you will have to add more stat information here eventually
         stat.st_mode.set(FileStat.S_IFREG | 0444 | 0200);
         stat.st_size.set(HELLO_STR.getBytes().length);
         stat.st_nlink.set(1);
         stat.st_uid.set(unix.getUid());
         stat.st_gid.set(unix.getGid());
+
+        //stat.st_ctim.set()
+        //Timespec ts = new Timespec(Runtime.getSystemRuntime()); 
+        //Timespec ts = Timespec.of(conn);
+
+        Timespec timespec1 = Timespec.of(conn);
+        Timespec timespec2 = Timespec.of(conn.slice(Struct.size(timespec1)));
+
+        // this.utimens(HELLO_PATH, new Timespec[] {timespec1, timespec2});
+
+       // stat.st_ctim.tv_sec.set(ts.tv_sec.get());
+        //stat.st_ctim.tv_nsec.set(ts.tv_nsec.longValue());
+
+        stat.st_ctim.tv_sec.set(timespec1.tv_sec.get());
+        stat.st_ctim.tv_nsec.set(timespec1.tv_nsec.longValue());
+
+
+        System.out.println("init ctim.tv_sec: " + stat.st_ctim.tv_sec.get());
+        System.out.println("init ctim.tv_nsec: " + stat.st_ctim.tv_nsec.longValue());
+        //this.utimens(HELLO_PATH, ts);
         
+
         //stat.st_ctim.set(FileStat.of(conn).st_ctim);
         //stat.st_ctim.set(new Timespec(stat.getRuntime()));
         //stat.st_ctim.tv_sec = Runtime.getSystemRuntime();
@@ -51,6 +77,7 @@ public class MemoryFS extends FileSystemStub {
         iNode.setStat(stat);
         iNode.setContent(HELLO_STR.getBytes());
         iNodeTable.updateINode(HELLO_PATH, iNode);
+        this.utimens(HELLO_PATH, new Timespec[] {timespec1, timespec2});
 
         if (isVisualised()) {
             visualiser = new MemoryVisualiser();
@@ -83,8 +110,10 @@ public class MemoryFS extends FileSystemStub {
             stat.st_atim.tv_nsec.set(savedStat.st_atim.tv_nsec.intValue());
             stat.st_mtim.tv_sec.set(savedStat.st_mtim.tv_sec.intValue());
             stat.st_mtim.tv_nsec.set(savedStat.st_mtim.tv_nsec.intValue());
-            stat.st_ctim.tv_sec.set(savedStat.st_ctim.tv_sec.intValue());
-            stat.st_ctim.tv_nsec.set(savedStat.st_ctim.tv_nsec.intValue());
+
+            System.out.println("ctim.tv_sec: " + savedStat.st_ctim.tv_sec.get());
+            stat.st_ctim.tv_sec.set(savedStat.st_ctim.tv_sec.get());
+            stat.st_ctim.tv_nsec.set(savedStat.st_ctim.tv_nsec.longValue());
 
 
         } else {
@@ -186,6 +215,19 @@ public class MemoryFS extends FileSystemStub {
         // timespec[0].tv_sec
         // timespec[1].tv_nsec
         // timespec[1].tv_sec
+
+        // Timespec timespec1 = Timespec.of(timespec);
+        // Timespec timespec2 = Timespec.of(timespec.slice(Struct.size(timespec1)));
+
+        System.out.println(timespec[0].tv_nsec.longValue());
+        System.out.println(timespec[0].tv_sec.get());
+        System.out.println(timespec[1].tv_nsec.longValue());
+        System.out.println(timespec[1].tv_sec.get());
+
+        // stat.st_ctim.tv_sec.set(ts.tv_sec.get());
+        // this.iNodeTable.getINode(path).getStat().st_ctim.tv_sec.set(timespec[1].tv_sec.get());
+        // this.iNodeTable.getINode(path).getStat().st_ctim.tv_nsec.set(timespec[1].tv_nsec.longValue());
+
         return 0;
     }
     
