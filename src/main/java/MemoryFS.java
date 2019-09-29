@@ -14,6 +14,7 @@ import util.MemoryINodeTable;
 import util.MemoryVisualiser;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Objects;
 
 import com.sun.security.auth.module.UnixSystem;
@@ -29,6 +30,7 @@ public class MemoryFS extends FileSystemStub {
     private MemoryINodeTable iNodeTable = new MemoryINodeTable();
     private MemoryVisualiser visualiser;
     private UnixSystem unix = new UnixSystem();
+    private Instant instant = Instant.now();
 
     @Override
     public Pointer init(Pointer conn) {
@@ -51,16 +53,22 @@ public class MemoryFS extends FileSystemStub {
         //Timespec ts = new Timespec(Runtime.getSystemRuntime()); 
         //Timespec ts = Timespec.of(conn);
 
-        Timespec timespec1 = Timespec.of(conn);
-        Timespec timespec2 = Timespec.of(conn.slice(Struct.size(timespec1)));
+        //Timespec timespec1 = Timespec.of(conn);
+        //Timespec timespec2 = Timespec.of(conn.slice(Struct.size(timespec1)));
 
         // this.utimens(HELLO_PATH, new Timespec[] {timespec1, timespec2});
 
        // stat.st_ctim.tv_sec.set(ts.tv_sec.get());
         //stat.st_ctim.tv_nsec.set(ts.tv_nsec.longValue());
+        stat.st_ctim.tv_sec.set(instant.getEpochSecond());
+        stat.st_ctim.tv_nsec.set(instant.getNano());
+        stat.st_mtim.tv_sec.set(instant.getEpochSecond());
+        stat.st_mtim.tv_nsec.set(instant.getNano());
+        stat.st_atim.tv_sec.set(instant.getEpochSecond());
+        stat.st_atim.tv_nsec.set(instant.getNano());
 
-        stat.st_ctim.tv_sec.set(timespec1.tv_sec.get());
-        stat.st_ctim.tv_nsec.set(timespec1.tv_nsec.longValue());
+        //stat.st_ctim.tv_sec.set(timespec1.tv_sec.get());
+        //stat.st_ctim.tv_nsec.set(timespec1.tv_nsec.longValue());
 
 
         System.out.println("init ctim.tv_sec: " + stat.st_ctim.tv_sec.get());
@@ -77,7 +85,7 @@ public class MemoryFS extends FileSystemStub {
         iNode.setStat(stat);
         iNode.setContent(HELLO_STR.getBytes());
         iNodeTable.updateINode(HELLO_PATH, iNode);
-        this.utimens(HELLO_PATH, new Timespec[] {timespec1, timespec2});
+        //this.utimens(HELLO_PATH, new Timespec[] {timespec1, timespec2});
 
         if (isVisualised()) {
             visualiser = new MemoryVisualiser();
