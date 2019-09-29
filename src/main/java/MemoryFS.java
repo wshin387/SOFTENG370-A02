@@ -160,6 +160,13 @@ public class MemoryFS extends FileSystemStub {
         // buf.put(0, content, offset, amount);
         int amount = 0;
 
+        System.out.println("reading path: " + path);
+        System.out.println("reading size: " + size);
+        System.out.println("reading offset: " + offset);        
+
+        //buf.put(offset, src, idx, len);
+        buf.put(offset, this.iNodeTable.getINode(path).getContent(), 0, (int) size);
+
         if (isVisualised()) {
             visualiser.sendINodeTable(iNodeTable);
         }
