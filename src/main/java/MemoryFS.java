@@ -158,15 +158,17 @@ public class MemoryFS extends FileSystemStub {
         // you need to extract data from the content field of the inode and place it in the buffer
         // something like:
         // buf.put(0, content, offset, amount);
-        int amount = 0;
+        int amount = this.iNodeTable.getINode(path).getContent().length;
 
+        
         System.out.println("reading path: " + path);
         System.out.println("reading size: " + size);
-        System.out.println("reading offset: " + offset);        
-        System.out.println("content length: "+ this.iNodeTable.getINode(path).getContent().length);
+        System.out.println("reading offset: " + offset);
+        System.out.println("content length: " + amount);
+
 
         //buf.put(offset, src, idx, len);
-        buf.put(offset, this.iNodeTable.getINode(path).getContent(), 0, this.iNodeTable.getINode(path).getContent().length);
+        buf.put(0, this.iNodeTable.getINode(path).getContent(), (int) offset, amount);
 
         if (isVisualised()) {
             visualiser.sendINodeTable(iNodeTable);
@@ -182,6 +184,7 @@ public class MemoryFS extends FileSystemStub {
         }
         // similar to read but you get data from the buffer like:
         // buf.get(0, content, offset, size);
+        //buf.get(0, this.iNodeTable.)
 
         if (isVisualised()) {
             visualiser.sendINodeTable(iNodeTable);
