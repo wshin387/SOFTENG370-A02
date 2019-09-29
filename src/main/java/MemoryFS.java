@@ -193,6 +193,9 @@ public class MemoryFS extends FileSystemStub {
         // similar to read but you get data from the buffer like:
         // buf.get(0, content, offset, size);
         //buf.get(0, this.iNodeTable.)
+        byte[] newContent = Arrays.copyOf(this.iNodeTable.getINode(path).getContent(), offset+size);
+
+        buf.get(0, newContent, (int) offset, (int) size);
 
         if (isVisualised()) {
             visualiser.sendINodeTable(iNodeTable);
