@@ -286,6 +286,14 @@ public class MemoryFS extends FileSystemStub {
     
     @Override
     public int link(java.lang.String oldpath, java.lang.String newpath) {
+
+        MemoryINode iNode = this.iNodeTable.getINode(oldpath);
+        FileStat oldStat = iNode.getStat();
+        oldStat.st_nlink.set(oldStat.st_nlink.intValue() + 1); //increment nlink
+
+        this.iNodeTable.updateINode(newpath, iNode);
+
+
         return 0;
     }
 
