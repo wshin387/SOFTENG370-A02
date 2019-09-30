@@ -31,7 +31,7 @@ public class MemoryFS extends FileSystemStub {
     private MemoryINodeTable iNodeTable = new MemoryINodeTable();
     private MemoryVisualiser visualiser;
     private UnixSystem unix = new UnixSystem();
-    private Instant instant = Instant.now();
+    //private Instant instant = Instant.now();
 
     @Override
     public Pointer init(Pointer conn) {
@@ -61,13 +61,22 @@ public class MemoryFS extends FileSystemStub {
 
        // stat.st_ctim.tv_sec.set(ts.tv_sec.get());
         //stat.st_ctim.tv_nsec.set(ts.tv_nsec.longValue());
+
         //13 hours behind NZ time
-        stat.st_ctim.tv_sec.set(instant.getEpochSecond());
-        stat.st_ctim.tv_nsec.set(instant.getNano());
-        stat.st_mtim.tv_sec.set(instant.getEpochSecond());
-        stat.st_mtim.tv_nsec.set(instant.getNano());
-        stat.st_atim.tv_sec.set(instant.getEpochSecond());
-        stat.st_atim.tv_nsec.set(instant.getNano());
+        stat.st_atim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_atim.tv_nsec.set(System.nanoTime());
+        stat.st_ctim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_ctim.tv_nsec.set(System.nanoTime());
+        stat.st_mtim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_mtim.tv_nsec.set(System.nanoTime());
+        // stat.st_ctim.tv_sec.set(instant.getEpochSecond());
+        // stat.st_ctim.tv_nsec.set(instant.getNano());
+        // stat.st_mtim.tv_sec.set(instant.getEpochSecond());
+        // stat.st_mtim.tv_nsec.set(instant.getNano());
+        // stat.st_atim.tv_sec.set(instant.getEpochSecond());
+        // stat.st_atim.tv_nsec.set(instant.getNano());
+        // stat.st_ctim.tv_sec.set(System.currentTimeMillis() / 1000);
+        // stat.st_ctim.tv_nsec.set(System.nanoTime());
 
         //stat.st_ctim.tv_sec.set(timespec1.tv_sec.get());
         //stat.st_ctim.tv_nsec.set(timespec1.tv_nsec.longValue());
@@ -116,10 +125,10 @@ public class MemoryFS extends FileSystemStub {
             stat.st_rdev.set(savedStat.st_rdev.intValue());
             stat.st_blksize.set(savedStat.st_blksize.intValue());
             stat.st_blocks.set(savedStat.st_blocks.intValue());
-            stat.st_atim.tv_sec.set(savedStat.st_atim.tv_sec.intValue());
-            stat.st_atim.tv_nsec.set(savedStat.st_atim.tv_nsec.intValue());
-            stat.st_mtim.tv_sec.set(savedStat.st_mtim.tv_sec.intValue());
-            stat.st_mtim.tv_nsec.set(savedStat.st_mtim.tv_nsec.intValue());
+            stat.st_atim.tv_sec.set(savedStat.st_atim.tv_sec.get());
+            stat.st_atim.tv_nsec.set(savedStat.st_atim.tv_nsec.longValue());
+            stat.st_mtim.tv_sec.set(savedStat.st_mtim.tv_sec.get());
+            stat.st_mtim.tv_nsec.set(savedStat.st_mtim.tv_nsec.longValue());
 
             System.out.println("ctim.tv_sec: " + savedStat.st_ctim.tv_sec.get());
             stat.st_ctim.tv_sec.set(savedStat.st_ctim.tv_sec.get());
@@ -176,6 +185,13 @@ public class MemoryFS extends FileSystemStub {
         System.out.println("reading offset: " + offset);
         System.out.println("content length: " + amount);
 
+        // FileStat stat = this.iNodeTable.getINode(path).getStat();
+        // stat.st_ctim.tv_sec.set(System.currentTimeMillis() / 1000);
+        // stat.st_ctim.tv_nsec.set(System.nanoTime());
+        // stat.st_atim.tv_sec.set(System.currentTimeMillis() / 1000);
+        // stat.st_atim.tv_nsec.set(System.nanoTime());
+        // stat.st_atim.tv_sec.set(instant.getEpochSecond());
+        // stat.st_atim.tv_nsec.set(instant.getNano());
 
         //buf.put(offset, src, idx, len);
         buf.put(0, this.iNodeTable.getINode(path).getContent(), (int) offset, amount);
@@ -185,8 +201,10 @@ public class MemoryFS extends FileSystemStub {
         }
 
         FileStat stat = this.iNodeTable.getINode(path).getStat();
-        stat.st_atim.tv_sec.set(instant.getEpochSecond());
-        stat.st_atim.tv_nsec.set(instant.getNano());
+        stat.st_atim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_atim.tv_nsec.set(System.nanoTime());
+
+        
 
         return amount;
     }
@@ -205,8 +223,8 @@ public class MemoryFS extends FileSystemStub {
 
         FileStat stat = iNode.getStat();
         stat.st_size.set(newSize);
-        stat.st_mtim.tv_sec.set(instant.getEpochSecond());
-        stat.st_mtim.tv_nsec.set(instant.getNano());
+        stat.st_mtim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_mtim.tv_nsec.set(System.nanoTime());
 
         byte[] content = iNode.getContent();
         
@@ -254,12 +272,12 @@ public class MemoryFS extends FileSystemStub {
         stat.st_nlink.set(1);
         stat.st_uid.set(unix.getUid());
         stat.st_gid.set(unix.getGid());
-        stat.st_ctim.tv_sec.set(instant.getEpochSecond());
-        stat.st_ctim.tv_nsec.set(instant.getNano());
-        stat.st_mtim.tv_sec.set(instant.getEpochSecond());
-        stat.st_mtim.tv_nsec.set(instant.getNano());
-        stat.st_atim.tv_sec.set(instant.getEpochSecond());
-        stat.st_atim.tv_nsec.set(instant.getNano());
+        stat.st_atim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_atim.tv_nsec.set(System.nanoTime());
+        stat.st_ctim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_ctim.tv_nsec.set(System.nanoTime());
+        stat.st_mtim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_mtim.tv_nsec.set(System.nanoTime());
 
         mockINode.setStat(stat);
         this.iNodeTable.updateINode(path, mockINode);
