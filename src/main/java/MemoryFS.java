@@ -295,6 +295,12 @@ public class MemoryFS extends FileSystemStub {
             return -ErrorCodes.ENONET();
         }
         // delete the file if there are no more hard links
+        FileStat stat = this.iNodeTable.getINode(path).getStat();
+        stat.st_nlink.set(stat.st_nlink.intValue() -1);
+
+        this.iNodeTable.removeINode(path);
+
+
         return 0;
     }
 
