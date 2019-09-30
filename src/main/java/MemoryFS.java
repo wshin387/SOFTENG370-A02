@@ -235,8 +235,16 @@ public class MemoryFS extends FileSystemStub {
 
         MemoryINode mockINode = new MemoryINode();
         // set up the stat information for this inode
+        FileStat stat = new FileStat(Runtime.getSystemRuntime());
+        stat.st_mode.set(mode);
+        stat.st_rdev.set(rdev);
+        stat.st_size.set(0);
+        stat.st_nlink.set(1);
+        stat.st_uid.set(unix.getUid());
+        stat.st_gid.set(unix.getGid());
 
-        iNodeTable.updateINode(path, mockINode);
+        mockINode.setStat(stat);
+        this.iNodeTable.updateINode(path, mockINode);
 
         if (isVisualised()) {
             visualiser.sendINodeTable(iNodeTable);
