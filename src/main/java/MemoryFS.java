@@ -61,6 +61,7 @@ public class MemoryFS extends FileSystemStub {
 
        // stat.st_ctim.tv_sec.set(ts.tv_sec.get());
         //stat.st_ctim.tv_nsec.set(ts.tv_nsec.longValue());
+        //13 hours behind NZ time
         stat.st_ctim.tv_sec.set(instant.getEpochSecond());
         stat.st_ctim.tv_nsec.set(instant.getNano());
         stat.st_mtim.tv_sec.set(instant.getEpochSecond());
