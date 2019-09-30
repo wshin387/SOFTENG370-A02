@@ -185,24 +185,24 @@ public class MemoryFS extends FileSystemStub {
         System.out.println("reading offset: " + offset);
         System.out.println("content length: " + amount);
 
-        // FileStat stat = this.iNodeTable.getINode(path).getStat();
+        FileStat stat = this.iNodeTable.getINode(path).getStat();
         // stat.st_ctim.tv_sec.set(System.currentTimeMillis() / 1000);
         // stat.st_ctim.tv_nsec.set(System.nanoTime());
-        // stat.st_atim.tv_sec.set(System.currentTimeMillis() / 1000);
-        // stat.st_atim.tv_nsec.set(System.nanoTime());
+        stat.st_atim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_atim.tv_nsec.set(System.nanoTime());
         // stat.st_atim.tv_sec.set(instant.getEpochSecond());
         // stat.st_atim.tv_nsec.set(instant.getNano());
 
         //buf.put(offset, src, idx, len);
         buf.put(0, this.iNodeTable.getINode(path).getContent(), (int) offset, amount);
 
+        // FileStat stat = this.iNodeTable.getINode(path).getStat();
+        // stat.st_atim.tv_sec.set(System.currentTimeMillis() / 1000);
+        // stat.st_atim.tv_nsec.set(System.nanoTime());
+
         if (isVisualised()) {
             visualiser.sendINodeTable(iNodeTable);
         }
-
-        FileStat stat = this.iNodeTable.getINode(path).getStat();
-        stat.st_atim.tv_sec.set(System.currentTimeMillis() / 1000);
-        stat.st_atim.tv_nsec.set(System.nanoTime());
 
         
 
