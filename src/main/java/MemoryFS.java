@@ -16,6 +16,7 @@ import util.MemoryVisualiser;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Arrays;
 
 import com.sun.security.auth.module.UnixSystem;
 
@@ -193,13 +194,35 @@ public class MemoryFS extends FileSystemStub {
         // similar to read but you get data from the buffer like:
         // buf.get(0, content, offset, size);
         //buf.get(0, this.iNodeTable.)
-        byte[] newContent = Arrays.copyOf(this.iNodeTable.getINode(path).getContent(), offset+size);
 
-        buf.get(0, newContent, (int) offset, (int) size);
+        MemoryINode iNode = this.iNodeTable.getINode(path);
+        int newSize = (int) (offset+size);
+        iNode.getStat().st_size.set(newSize);
+        byte[] content = iNode.getContent();
+        
+
+        if (content.length < newSize) {
+            content = Arrays.copyOf(iNode.getContent(), newSize);
+            // int oldSize = content.length;
+
+            // byte[] newContent = new byte[newSize];
+            // for (int i=0; i < newSize; i++) {
+            //     if (i < oldSize) {
+            //         newContent[i] = content[i]; 
+            //     }
+            // }
+            // content = newContent;
+        }
+        
+        
+
+        buf.get(0, content, (int) offset, (int) size);
+        iNode.setContent(content);
 
         if (isVisualised()) {
             visualiser.sendINodeTable(iNodeTable);
         }
+
 
         return (int) size;
     }
