@@ -165,24 +165,17 @@ public class MemoryFS extends FileSystemStub {
         // buf.get(0, content, offset, size);
 
         MemoryINode iNode = this.iNodeTable.getINode(path);
-        int newSize = (int) (offset+size);
+
+        byte[] content = Arrays.copyOf(iNode.getContent(), iNode.getContent().length + (int) size);
+        iNode.setContent(content);
 
         FileStat stat = iNode.getStat();
-        stat.st_size.set(newSize);
+        stat.st_size.set(content.length);
         stat.st_mtim.tv_sec.set(System.currentTimeMillis() / 1000);
         stat.st_mtim.tv_nsec.set(System.nanoTime());
-
-        byte[] content = iNode.getContent();
-        
-
-        if (content.length < newSize) {
-            content = Arrays.copyOf(iNode.getContent(), newSize);
-        }
-        
         
 
         buf.get(0, content, (int) offset, (int) size);
-        iNode.setContent(content);
 
         if (isVisualised()) {
             visualiser.sendINodeTable(iNodeTable);
