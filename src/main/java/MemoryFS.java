@@ -21,7 +21,7 @@ import java.util.Arrays;
 import com.sun.security.auth.module.UnixSystem;
 
 /**
- * @author Luke Thompson and William Shin
+ * @author Luke Thompson and William Shin | wshi593
  * @since 04.09.19
  */
 public class MemoryFS extends FileSystemStub {
