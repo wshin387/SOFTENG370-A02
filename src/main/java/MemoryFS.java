@@ -111,6 +111,9 @@ public class MemoryFS extends FileSystemStub {
         //      stbuf - the FileStat information for the file
         //      off - just use 0
 
+        filler.apply(buf, ".", null, 0);
+        filler.apply(buf, "..", null, 0);
+
         for (String fileName: this.iNodeTable.entries()) {
             filler.apply(buf, fileName.substring(1), this.iNodeTable.getINode(fileName).getStat(), 0);
         }
