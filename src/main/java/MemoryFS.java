@@ -117,7 +117,7 @@ public class MemoryFS extends FileSystemStub {
         filler.apply(buf, "..", null, 0);
 
         for (String fileName: this.iNodeTable.entries()) {
-            if (this.containsFile(fileName, path)) {
+            if (this.containsFile(path, fileName)) {
                 int substringIndex = fileName.lastIndexOf('/') + 1;
                 filler.apply(buf, fileName.substring(substringIndex), this.iNodeTable.getINode(fileName).getStat(), 0);
             }
