@@ -350,7 +350,7 @@ public class MemoryFS extends FileSystemStub {
             // stringPath[index] = sb.toString();
         }
 
-        if (!(splitPath.length +1 != splitFile.length)) {
+        if (!(splitPath.length != splitFile.length + 1)) {
             return false;
         }
 
