@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import com.sun.security.auth.module.UnixSystem;
 
@@ -31,6 +32,7 @@ public class MemoryFS extends FileSystemStub {
     private MemoryINodeTable iNodeTable = new MemoryINodeTable();
     private MemoryVisualiser visualiser;
     private UnixSystem unix = new UnixSystem();
+    private HashSet<String> directories = new HashSet<>();
 
     @Override
     public Pointer init(Pointer conn) {
@@ -115,7 +117,11 @@ public class MemoryFS extends FileSystemStub {
         filler.apply(buf, "..", null, 0);
 
         for (String fileName: this.iNodeTable.entries()) {
-            filler.apply(buf, fileName.substring(1), this.iNodeTable.getINode(fileName).getStat(), 0);
+            if (this.containsFile(fileName, path)) {
+                int substringIndex = fileName.lastIndexOf('/') + 1;
+                filler.apply(buf, fileName.substring(substringIndex), this.iNodeTable.getINode(fileName).getStat(), 0);
+            }
+            //filler.apply(buf, fileName.substring(1), this.iNodeTable.getINode(fileName).getStat(), 0);
         }
 
         return 0;
@@ -264,12 +270,97 @@ public class MemoryFS extends FileSystemStub {
 
     @Override
     public int mkdir(String path, long mode) {
+        if (iNodeTable.containsINode(path)) {
+            return -ErrorCodes.EEXIST();
+        }
+
+        directories.add(path);
+        MemoryINode mockINode = new MemoryINode();
+        // set up the stat information for this inode
+        FileStat stat = new FileStat(Runtime.getSystemRuntime());
+        stat.st_mode.set(mode | FileStat.S_IFDIR);
+        stat.st_size.set(0);
+        stat.st_nlink.set(2);
+        stat.st_uid.set(unix.getUid());
+        stat.st_gid.set(unix.getGid());
+        stat.st_atim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_atim.tv_nsec.set(System.nanoTime());
+        stat.st_ctim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_ctim.tv_nsec.set(System.nanoTime());
+        stat.st_mtim.tv_sec.set(System.currentTimeMillis() / 1000);
+        stat.st_mtim.tv_nsec.set(System.nanoTime());
+
+        mockINode.setStat(stat);
+        this.iNodeTable.updateINode(path, mockINode);
+        this.updateLinkCount(path, 1);
+
+        if (isVisualised()) {
+            visualiser.sendINodeTable(iNodeTable);
+        }
+
         return 0;
     }
 
     @Override
     public int rmdir(String path) {
+        this.iNodeTable.removeINode(path);
+        this.directories.remove(path);
+        this.updateLinkCount(path, -1);
+
+        for (String fileName: this.iNodeTable.entries()) {
+            if (fileName.contains(path)) {
+                this.iNodeTable.removeINode(fileName);
+            }
+        }
+
         return 0;
+    }
+
+    private void updateLinkCount(String path, int value) {
+        if (path.equals("/")) {
+            return;
+        }
+
+        int parentPathIndex = path.lastIndexOf("/");
+
+        if (parentPathIndex == 0) {
+            return;
+        }
+
+        String parentPath = path.substring(0, parentPathIndex);
+        MemoryINode iNode = iNodeTable.getINode(parentPath);
+
+        if (iNode == null) {
+            return;
+        }
+
+        FileStat stat = iNode.getStat();
+        stat.st_nlink.set(stat.st_nlink.intValue() + value);
+    }
+
+    private boolean containsFile(String path, String file) {
+        String[] splitPath = path.split("(?<=/)");
+        String[] splitFile = file.split("(?<=/)");
+
+        if (this.directories.contains(path)) {
+            int index = splitPath.length - 1;
+            splitPath[index] += "/";
+            // StringBuilder sb = new StringBuilder(splitPath[index]);
+            // sb.append("/");
+            // stringPath[index] = sb.toString();
+        }
+
+        if (!(splitPath.length +1 != splitFile.length)) {
+            return false;
+        }
+
+        for (int i=0; i<splitPath.length; i++) {
+            if (!splitFile[i].equals(splitPath[i])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
